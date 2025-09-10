@@ -1,0 +1,452 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>PhotharamBeetle — Product Showcase</title>
+
+  <!-- Fonts & Icons -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;800&display=swap" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/remixicon@4.3.0/fonts/remixicon.css" rel="stylesheet"/>
+
+  <style>
+    :root{
+      --bg-1:#0d0f1a; --bg-2:#142235; --bg-3:#0d0f1a;
+      --glass: rgba(255,255,255,.07); --border: rgba(255,255,255,.12);
+      --brand:#47cf73; --text:#eaf3ff; --muted:#a9b6c8;
+      --card:#101827cc; --shadow: 0 10px 30px rgba(0,0,0,.35);
+      --fab:#00ffa3; --accent:#00d48a; --danger:#ff5964;
+      --post:#e60023; --flash:#ffd400;
+    }
+
+    html,body{height:100%}
+    body{
+      margin:0; font-family:'Poppins',system-ui,-apple-system,Segoe UI,Roboto,sans-serif;
+      color:var(--text);
+      background:linear-gradient(120deg,var(--bg-1),var(--bg-2),var(--bg-3));
+      background-size:400% 400%; animation:gradientBG 18s ease infinite;
+      overflow-x:hidden;
+    }
+    @keyframes gradientBG{0%{background-position:0% 50%}50%{background-position:100% 50%}100%{background-position:0% 50%}}
+    @media (prefers-reduced-motion:reduce){ body{animation:none} .particle,.flyer{animation:none!important} }
+
+    a{color:inherit} img{max-width:100%;display:block}
+
+    /* Background FX */
+    .fx-wrap{position:fixed;inset:0;z-index:-1;pointer-events:none;overflow:hidden;}
+    .particle{
+      position:absolute;width:6px;height:6px;border-radius:50%;
+      background: radial-gradient(circle at 30% 30%, #ffffcc, #ffd83b 60%, transparent 70%);
+      box-shadow:0 0 16px 6px rgba(255,255,160,.4);
+      animation:floaty 8s ease-in-out infinite; opacity:.85; filter:saturate(1.2);
+    }
+    @keyframes floaty{0%{transform:translate(0,0)}50%{transform:translate(30px,-50px)}100%{transform:translate(0,0)}}
+    .flyer{
+      position:absolute; width:56px; height:56px; opacity:.95;
+      filter: drop-shadow(0 10px 20px rgba(0,0,0,.45));
+      animation: flyLR 22s linear infinite;
+    }
+    .flyer.flip{ animation-name: flyRL }
+    @keyframes flyLR{0%{transform:translateX(-15%) translateY(20vh)}50%{transform:translateX(110%) translateY(50vh)}100%{transform:translateX(-15%) translateY(20vh)}}
+    @keyframes flyRL{0%{transform:translateX(110%) translateY(70vh)}50%{transform:translateX(-15%) translateY(35vh)}100%{transform:translateX(110%) translateY(70vh)}}
+    .wing-left,.wing-right{ animation: flap .55s ease-in-out infinite alternate }
+    .wing-left{ transform-origin: 28px 28px }
+    .wing-right{ transform-origin: 36px 28px }
+    @keyframes flap{0%{transform:rotate(0)}100%{transform:rotate(16deg)}}
+
+    /* Header */
+    .site-header{
+      position:sticky;top:0;z-index:30;display:flex;align-items:center;
+      justify-content:space-between;gap:12px;padding:12px 16px;
+      background:linear-gradient(to bottom, rgba(6,10,16,.75), rgba(6,10,16,.35));
+      backdrop-filter: blur(10px); border-bottom:1px solid var(--border);
+    }
+    .brand{ display:flex;align-items:center;gap:12px }
+    .logo img{
+      width:64px;height:64px;border-radius:50%;object-fit:cover;
+      box-shadow:0 0 0 5px rgba(71,207,115,.15), 0 10px 24px rgba(71,207,115,.25);
+      transition: transform .35s ease, filter .35s ease;
+    }
+    .logo img:hover{ transform: scale(1.06) rotate(-3deg); filter: saturate(1.1) }
+    .brand-text h1{margin:0;font-size:1.15rem;font-weight:800;letter-spacing:.2px}
+    .brand-text span{color:var(--brand)}
+    .tagline{margin:.1rem 0 0;color:var(--muted);font-size:.9rem}
+
+    .main-nav{display:none}
+    .main-nav ul{display:flex;gap:18px;list-style:none;margin:0;padding:0}
+    .main-nav a{
+      text-decoration:none;padding:8px 10px;border-radius:12px;color:var(--text);
+      transition:.25s;border:1px solid transparent
+    }
+    .main-nav a:hover{ color:#000;background:var(--brand) }
+    .menu-btn{
+      display:inline-flex;align-items:center;gap:8px;background:var(--glass);
+      border:1px solid var(--border);color:var(--text);padding:10px 12px;border-radius:14px;cursor:pointer;transition:.25s
+    }
+    .menu-btn:hover{ background:rgba(255,255,255,.12) }
+
+    /* Drawer */
+    .drawer{position:fixed;right:0;top:0;height:100%;width:min(84%,360px);
+      background:rgba(12,18,28,.96);backdrop-filter: blur(14px);border-left:1px solid var(--border);
+      transform:translateX(100%);transition:.35s ease;z-index:50;display:flex;flex-direction:column}
+    .drawer.open{ transform:translateX(0) }
+    .drawer header{display:flex;align-items:center;justify-content:space-between;padding:14px 16px;border-bottom:1px solid var(--border)}
+    .drawer nav a{ display:block;padding:14px 16px;border-bottom:1px solid rgba(255,255,255,.06); text-decoration:none }
+    .overlay{ position:fixed;inset:0;background:rgba(0,0,0,.45);opacity:0;pointer-events:none;transition:.35s;z-index:40 }
+    .overlay.show{opacity:1;pointer-events:auto}
+
+    /* Sections & Cards */
+    .content{ padding:22px }
+    .section-card{ max-width:1200px;margin:0 auto;padding:26px 6px }
+    .section-head h2{ font-size:1.4rem;margin:.2rem 0 }
+    .section-sub{ color:var(--muted);margin:0 0 12px }
+    .product-grid{display:grid;gap:18px;grid-template-columns: repeat( auto-fill, minmax(220px,1fr) );}
+    .product-card{
+      background:linear-gradient(180deg, rgba(255,255,255,.08), rgba(255,255,255,.04));
+      border:1px solid var(--border); border-radius:16px;padding:14px;box-shadow: var(--shadow);
+      transition: transform .28s ease, box-shadow .28s ease, border-color .28s ease;
+    }
+    .product-card:hover{ transform: translateY(-8px) scale(1.02); border-color: rgba(71,207,115,.45); box-shadow: 0 20px 40px rgba(0,0,0,.5) }
+    .media{ position:relative;border-radius:12px;overflow:hidden }
+    .media img{ width:100%;height:200px;object-fit:cover; display:block; transform: scale(1.02); transition: transform .6s ease }
+    .product-card:hover .media img{ transform: scale(1.06) }
+    .badge{
+      position:absolute;left:10px;top:10px;background:#101c14cc;color:#cfffdf;border:1px solid #00ff88a8;
+      padding:6px 10px;border-radius:999px;font-size:.8rem;backdrop-filter: blur(6px)
+    }
+    .badge.soldout{ background: rgba(230,0,35,.13); color: var(--post); border-color: var(--post) }
+    h3{ margin:12px 0 6px;font-size:1.05rem }
+    p{ margin:0 0 10px;color:var(--muted) }
+    .card-actions{ display:flex;gap:10px; }
+    .btn{
+      display:inline-flex;align-items:center;justify-content:center;gap:8px;border:none;border-radius:12px;padding:10px 12px;cursor:pointer;
+      background:rgba(255,255,255,.12);color:var(--text);transition:.25s
+    }
+    .btn.icon{ width:42px;height:42px;padding:0 }
+    .btn:hover{ background:var(--brand);color:#0a1018 }
+
+    /* Footer */
+    .site-footer{
+      text-align:center;padding:18px;margin-top:10px;border-top:1px solid var(--border);
+      background: linear-gradient( to top, rgba(0,0,0,.35), rgba(0,0,0,0) );
+    }
+
+    /* Shipping Options */
+    .shipping-section{
+      max-width: 1100px; margin: 8px auto 22px; padding: 10px 12px;
+      background: linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.03));
+      border: 1px solid var(--border); border-radius: 16px;
+      backdrop-filter: blur(8px);
+    }
+    .shipping-header{display:flex; align-items:center; justify-content:space-between; gap:10px; margin-bottom:10px;}
+    .shipping-header h3{ margin:0; font-size:1.05rem }
+    .ship-grid{display:grid; grid-template-columns: repeat(auto-fit, minmax(220px,1fr)); gap:12px}
+    .ship-card{display:flex; gap:12px; align-items:center; padding:12px; border-radius:14px;
+      background: rgba(255,255,255,.06); border:1px solid var(--border); cursor:pointer; transition:.25s}
+    .ship-card:hover{ border-color: rgba(255,255,255,.35) }
+    .ship-card.active{ outline: 2px solid var(--brand); background: rgba(0, 255, 163, .08) }
+    .ship-logo{ width:48px;height:48px;border-radius:12px;display:grid;place-items:center;background:#0b1320;border:1px solid var(--border) }
+    .ship-info{ flex:1 }
+    .ship-title{ margin:0; font-weight:700; display:flex; align-items:center; gap:8px }
+    .ship-sub{ margin:2px 0 0; color:var(--muted); font-size:.9rem }
+    .chip{font-size:.8rem; padding:4px 8px; border-radius:999px; border:1px solid currentColor; display:inline-flex; align-items:center; gap:6px}
+    .chip.post{ color: var(--post); background: rgba(230,0,35,.12) }
+    .chip.flash{ color:#000; background: rgba(255,212,0,.7); border-color: rgba(0,0,0,.25) }
+
+    /* FAB */
+    .fab{ position:fixed; right:16px; bottom:76px; z-index:60; display:flex; flex-direction:column; align-items:flex-end; gap:10px }
+    .fab .fab-menu{ display:grid; gap:8px; transform-origin: bottom right; transform: scale(0.9); opacity:0; pointer-events:none; transition:.2s }
+    .fab.open .fab-menu{ transform:scale(1); opacity:1; pointer-events:auto }
+    .fab .fab-item{ display:inline-flex; align-items:center; gap:8px; background:rgba(15,22,32,.9);
+      border:1px solid var(--border); color:var(--text); padding:10px 12px; border-radius:12px; text-decoration:none; backdrop-filter: blur(10px) }
+    .fab .fab-btn{
+      width:56px;height:56px;border-radius:50%;display:grid;place-items:center;cursor:pointer;border:none;
+      background: radial-gradient(120% 120% at 20% 20%, var(--fab), #00d48a 60%, #00b37e);
+      color:#032016; font-size:24px; box-shadow: 0 10px 30px rgba(0,255,163,.35);
+      transition: transform .15s ease;
+    }
+    .fab .fab-btn:active{ transform: scale(.96) }
+
+    /* Responsive */
+    @media (min-width: 880px){
+      .main-nav{display:block}
+      .menu-btn{display:none}
+      .brand-text h1{font-size:1.25rem}
+    }
+    @media (max-width:420px){
+      .logo img{width:56px;height:56px}
+      .media img{height:170px}
+    }
+  </style>
+</head>
+<body>
+  <!-- ===== SVG SYMBOLS ===== -->
+  <svg width="0" height="0" style="position:absolute">
+    <defs>
+      <linearGradient id="gShell" x1="0" x2="1" y1="0" y2="1">
+        <stop offset="0%" stop-color="#0d1b2a"/><stop offset="60%" stop-color="#12263a"/><stop offset="100%" stop-color="#185a4d"/>
+      </linearGradient>
+      <linearGradient id="gLeg" x1="0" x2="1" y1="0" y2="1">
+        <stop offset="0%" stop-color="#0b0f15"/><stop offset="100%" stop-color="#2a2f36"/>
+      </linearGradient>
+
+      <symbol id="beetle" viewBox="0 0 64 64">
+        <path d="M32 10c-7.5 0-13 6.8-13 14.5v9.5c0 8.5 6.2 17 13 17s13-8.5 13-17v-9.5C45 16.8 39.5 10 32 10z" fill="url(#gShell)" stroke="#0a0f14" stroke-width="1"/>
+        <path d="M32 10v41" stroke="#0e151c" stroke-width="1.2" opacity=".9"/>
+        <ellipse cx="32" cy="17" rx="8" ry="6" fill="#0b121a"/>
+        <path d="M24 16c-3-4-7-6-10-6 3 1 6 5 7 8" fill="none" stroke="#0b121a" stroke-width="2" stroke-linecap="round"/>
+        <path d="M40 16c3-4 7-6 10-6-3 1-6 5-7 8" fill="none" stroke="#0b121a" stroke-width="2" stroke-linecap="round"/>
+        <g class="wing-left" opacity=".85">
+          <path d="M31 20c-8 0-13 6-13 10 0 3 4 6 8 6 4 0 6-2 7-5 1-3 1-7-2-11z" fill="rgba(255,255,255,.12)" stroke="rgba(255,255,255,.2)" stroke-width=".6"/>
+        </g>
+        <g class="wing-right" opacity=".85">
+          <path d="M33 20c8 0 13 6 13 10 0 3-4 6-8 6-4 0-6-2-7-5-1-3-1-7 2-11z" fill="rgba(255,255,255,.12)" stroke="rgba(255,255,255,.2)" stroke-width=".6"/>
+        </g>
+        <g fill="url(#gLeg)" stroke="#0a0f14" stroke-width=".8" stroke-linecap="round">
+          <path d="M19 30l-8 4"/><path d="M19 36l-9 7"/><path d="M45 30l8 4"/><path d="M45 36l9 7"/><path d="M24 44l-6 9"/><path d="M40 44l6 9"/>
+        </g>
+        <ellipse cx="28" cy="18" rx="2.2" ry="1.3" fill="rgba(255,255,255,.35)"/>
+      </symbol>
+
+      <!-- Thai Post logo (simplified) -->
+      <symbol id="logo-thaipost" viewBox="0 0 64 64">
+        <rect x="6" y="18" width="52" height="28" rx="4" fill="white"/>
+        <path d="M6 22l26 14L58 22" fill="none" stroke="#c2001b" stroke-width="3" />
+        <path d="M42 16l16 6-10 2" fill="none" stroke="#c2001b" stroke-width="3" stroke-linecap="round"/>
+      </symbol>
+      <!-- Flash logo -->
+      <symbol id="logo-flash" viewBox="0 0 64 64">
+        <rect x="10" y="18" width="44" height="28" rx="4" fill="#111"/>
+        <path d="M26 20h12l-6 10h10L28 48l6-14h-8z" fill="#ffd400" stroke="#ffd400" stroke-width="1"/>
+      </symbol>
+    </defs>
+  </svg>
+
+  <!-- Background -->
+  <div class="fx-wrap" id="fxWrap" aria-hidden="true"></div>
+
+  <!-- Header -->
+  <header class="site-header">
+    <div class="brand">
+      <div class="logo">
+        <img
+          src="https://scontent.fcnx2-1.fna.fbcdn.net/v/t39.30808-6/491643316_1490268048954129_6075168819415813012_n.jpg?_nc_cat=111&ccb=1-7&_nc_sid=6ee11a&_nc_ohc=qXKSdIIVvyMQ7kNvwH58Smo&_nc_oc=Admx8aoI6W3LHMsakrfBi1GPTq8SuqSJw9TZ_7iTD9pYepi-W0m-v9Tj1OCZS7HT5gFItGVq9_hx11IBb_6p7cax&_nc_zt=23&_nc_ht=scontent.fcnx2-1.fna&_nc_gid=6Hrep5sUIfJ-wBwOzGrDyg&oh=00_AfYqLIjMUl1vEM0T2_ozl1QX5Uoe-D4gkbLPCFw5yRRyuA&oe=68C70156"
+          alt="PhotharamBeetle Logo">
+      </div>
+      <div class="brand-text">
+        <h1>Photharam<span>Beetle</span></h1>
+        <p class="tagline"><i class="ri-sparkling-2-fill"></i> Beetle breeding by Photharam beetle in Thailand</p>
+      </div>
+    </div>
+
+    <nav class="main-nav" aria-label="primary">
+      <ul>
+        <li><a href="#เต็มวัย"><i class="ri-bug-line"></i> เต็มวัย</a></li>
+        <li><a href="#ตัวอ่อนกว่าง"><i class="ri-seedling-line"></i> ตัวอ่อนกว่าง</a></li>
+        <li><a href="#ตัวอ่อนคีม"><i class="ri-scissors-2-line"></i> ตัวอ่อนคีม</a></li>
+        <li><a href="#coming-soon"><i class="ri-time-line"></i> COMING SOON</a></li>
+      </ul>
+    </nav>
+
+    <button class="menu-btn" id="menuBtn" aria-controls="drawer" aria-expanded="false">
+      <i class="ri-menu-line"></i> เมนู
+    </button>
+  </header>
+
+  <!-- Drawer -->
+  <aside class="drawer" id="drawer" aria-hidden="true">
+    <header>
+      <strong>เมนู</strong>
+      <button class="btn icon" id="closeDrawer" aria-label="ปิดเมนู"><i class="ri-close-line"></i></button>
+    </header>
+    <nav>
+      <a href="#เต็มวัย" onclick="closeNav()">🪲 เต็มวัย</a>
+      <a href="#ตัวอ่อนกว่าง" onclick="closeNav()">🌱 ตัวอ่อนกว่าง</a>
+      <a href="#ตัวอ่อนคีม" onclick="closeNav()">✂️ ตัวอ่อนด้วงคีม</a>
+      <a href="#coming-soon" onclick="closeNav()">⏳ COMING SOON</a>
+    </nav>
+  </aside>
+  <div class="overlay" id="overlay" tabindex="-1" aria-hidden="true"></div>
+
+  <main class="content">
+<!-- ========= Section: เต็มวัย ========= --> <section id="เต็มวัย" class="section-card"> <div class="section-head"> <h2><i class="ri-sparkling-2-line"></i> รายการเต็มวัย</h2> <p class="section-sub">อัปเดตล่าสุด9/10/2025ด้วงกว่าง-ด้วงคีม-ด้วงดอกไม้</p> </div> <div class="product-grid"> <article class="product-card"> <div class="media"> <img loading="lazy" src="https://scontent.fcnx2-1.fna.fbcdn.net/v/t39.30808-6/546027932_3977654815898560_2470802768524271975_n.jpg?_nc_cat=100&ccb=1-7&_nc_sid=833d8c&_nc_ohc=om_aIDbV9rAQ7kNvwGuHLGk&_nc_oc=AdmaWOUfA6JN3l0RFURryNVr5ajMhJ3Au7uThCqzzF7N6CdETs-1hn5zNc0iD62sqGm_FGUCm6oy9Uz6We77yj5B&_nc_zt=23&_nc_ht=scontent.fcnx2-1.fna&_nc_gid=udgeK3Y1lwibarwsXfq7oA&oh=00_AfZbbmIuV--WrKINu-k6cEN6nDf2AXjuPlQ46WtyfT7Vnw&oe=68C71781" alt="Product 1"> <span class="badge"><i class="ri-truck-line"></i> 200</span> <h3>ด้วงคีมดาบญี่ปุ่น</h3> <p>Prosopocoilus inclinatus inclinatus:ผู้เดี่ยว55:WD:1ตัว</p> </article> </article> <article class="product-card"> <div class="media"> <img loading="lazy" src="https://scontent.fcnx2-1.fna.fbcdn.net/v/t39.30808-6/546423470_3977653175898724_6451330868511675131_n.jpg?_nc_cat=109&ccb=1-7&_nc_sid=833d8c&_nc_ohc=62U_i7NKEFgQ7kNvwE7dMQA&_nc_oc=AdmZlwDrXIkN0-6AVSeBdSA2NBZjNfWQSu7qC_RChekXOyZk79V8fTPxzCugxR6iNlMctN160VEypOFVdjKOTsPv&_nc_zt=23&_nc_ht=scontent.fcnx2-1.fna&_nc_gid=VReyHIT6mhnQh9RUi-PoXg&oh=00_AfZSsO_vvJlItLfPZKccAX1kW4JbZVgFnNIgEj_R9x8rwA&oe=68C73EE9" alt="Product 1"> <span class="badge"><i class="ri-truck-line"></i> 170</span> <h3>ด้วงคีมเนื้อทรายเชียงใหม่</h3> <p>Cyclommatus pahangensis chiangmaiensis:ตัวเพาะ:1คู่</p> </article> </article> <article class="product-card"> <div class="media"> <img loading="lazy" src="https://scontent.fcnx2-1.fna.fbcdn.net/v/t39.30808-6/547272198_3977653349232040_6016823401282437071_n.jpg?_nc_cat=109&ccb=1-7&_nc_sid=833d8c&_nc_ohc=siuxQmgT830Q7kNvwG76KGs&_nc_oc=AdmsineDDjgu3W9WOXAwX_QJKl06xPQVn76cVq2aq-fWj30CAD27yVPZILi8srO1prFzpDbqveC5985wJ4ZNn2xa&_nc_zt=23&_nc_ht=scontent.fcnx2-1.fna&_nc_gid=Y8AOX8dfebtECf9KDH5Yag&oh=00_AfZ38PUw_d3YkUeWyP9iTsLUyzS-cUGD6MbcGosa3bd7eQ&oe=68C73550" alt="Product 1"> <span class="badge"><i class="ri-truck-line"></i> 300</span> <h3>ด้วงคีมปลวกเมลยี</h3> <p>Homoderus mellyi:ผู้เดี่ยว36:ตัวเพาะ:1ตัว</p> </article> </article> <article class="product-card"> <div class="media"> <img loading="lazy" src="https://scontent.fcnx2-1.fna.fbcdn.net/v/t39.30808-6/546993411_3977655529231822_2230192094593245964_n.jpg?_nc_cat=107&ccb=1-7&_nc_sid=833d8c&_nc_ohc=yag9kweR_eYQ7kNvwHa4dns&_nc_oc=AdmG19vPHdXLFtN1dFD9bDC-2guopYJHmdZ9mIqndXyYo6UC3yMRApqegAUUahtaUKG86DfCJ5FRKKZ4PPlh4xmL&_nc_zt=23&_nc_ht=scontent.fcnx2-1.fna&_nc_gid=nADJnpsuRXshj9AOU3esGw&oh=00_AfZn-S5WD00JaAEwnqRICqxwY_Xr6hHl27HdJ15_Qtq4Ig&oe=68C71993" alt="Product 1"> <span class="badge"><i class="ri-truck-line"></i>Rare300</span> <h3>ด้วงคีมเนื้อทรายเขี้ยวจันทร์</h3> <p>𝘾𝙮𝙘𝙡𝙤𝙢𝙢𝙖𝙩𝙪𝙨 𝙡𝙪𝙣𝙞𝙛𝙚𝙧:ผู้เดี่ยว36+:ตัวป่า:1ตัว</p> </article> </article> <article class="product-card"> <div class="media"> <img loading="lazy" src="https://scontent.fcnx2-1.fna.fbcdn.net/v/t39.30808-6/545968997_3977678369229538_10231361960693302_n.jpg?_nc_cat=107&ccb=1-7&_nc_sid=833d8c&_nc_ohc=AYiwiji25I4Q7kNvwEz4jI9&_nc_oc=AdnTHSI_Wdn9WOlmTQiI6X7hpX0iW0wvHdaFGFEtxarNMzVS4bhPGeNDHNN7Hp6Rmd6Q5-GvYN86sHrIqEOWYbnR&_nc_zt=23&_nc_ht=scontent.fcnx2-1.fna&_nc_gid=4CN8qvzrC9jdf-2lZZfeAg&oh=00_AfYBD1lRlStb1sR0HP5OFaoLOehtUGirHi5NsTkjX-f3XQ&oe=68C74935" alt="Product 1"> <span class="badge"><i class="ri-truck-line"></i>Rare70</span> <h3>ด้วงคีมเนื้อทรายเขี้ยวจันทร์</h3> <p>𝘾𝙮𝙘𝙡𝙤𝙢𝙢𝙖𝙩𝙪𝙨 𝙡𝙪𝙣𝙞𝙛𝙚𝙧:ผู้เดี่ยว40+:ตัวป่า:ตำหนิ:1ตัว</p> </article> </article> </div> </section> <!-- ========= Section: ตัวอ่อนกว่าง ========= --> <section id="ตัวอ่อนกว่าง" class="section-card"> <div class="section-head"> <h2><i class=" fas fa-dragon"></i> ตัวอ่อนด้วงกว่าง</h2> <p class="section-sub">อัปเดตล่าสุด9/10/2025</p> </div> <div class="product-grid"> <article class="product-card"> <div class="media"> <img loading="lazy" src="https://scontent.fcnx2-1.fna.fbcdn.net/v/t39.30808-6/545841110_3977550582575650_8177105464711486737_n.jpg?_nc_cat=104&ccb=1-7&_nc_sid=833d8c&_nc_ohc=g8dy2BsntgYQ7kNvwFlLJir&_nc_oc=Adk_A1Egdggpr0fyN9hU1hGwOCs7R01s6sCWG473OTLFAnYJLQfKYHIa7wypDLKPRNiO2flJz5dWQLcQJwOagQ4N&_nc_zt=23&_nc_ht=scontent.fcnx2-1.fna&_nc_gid=MM6zMz5g7N70NluHEcnYFA&oh=00_AfbR8WQOurlqTIjA7FSncpkumaqDIPPgrvmxnpFnepRcXA&oe=68C71C9A" alt="Product 1"> <span class="badge"><i class="ri-truck-line"></i> 250</span> <h3>มูชิคิงดำ</h3> <p>Allomyrina dichotomus politus:ตัวอ่อนระยะL3:1คู่</p> </article> <article class="product-card"> <div class="media"> <img loading="lazy" src="https://scontent.fcnx2-1.fna.fbcdn.net/v/t39.30808-6/545598259_3977550325909009_1835683852447228918_n.jpg?stp=cp6_dst-jpg_tt6&_nc_cat=110&ccb=1-7&_nc_sid=833d8c&_nc_ohc=2cCNY_dYpBAQ7kNvwEq4eTn&_nc_oc=AdmPzfjLycZbVkjmJGIaUCWdrs1vjpq-7mB1OqdHqISsMULK0NJXPnJuVKVHGPeVQZS-lF7nSMFDAiEdnS-VZJ58&_nc_zt=23&_nc_ht=scontent.fcnx2-1.fna&_nc_gid=-uW4hSp9fZTtVwfMA-fIAQ&oh=00_AfaV9kkvAIYOF_1MY5UIG6JVPBk4QyRhyP5ejj49B_S-Yg&oe=68C72831" alt="Product 1"> <span class="badge"><i class="ri-truck-line"></i> 350</span> <h3>มูชิคิงแดงญี่ปุ่นลูกครึ่ง</h3> <p>Allomyrina dichotoma septentrionalis:พ่อตาดำXแม่ตาแดง ตัวอ่อนระยะL3:1คู่</p> <div class="card-actions"> </div> </article> <article class="product-card"> <div class="media"> <img loading="lazy" src="https://scontent.fcnx2-1.fna.fbcdn.net/v/t39.30808-6/503235944_1529643395016594_5419078559348762572_n.jpg?stp=cp6_dst-jpg_tt6&_nc_cat=102&ccb=1-7&_nc_sid=833d8c&_nc_ohc=T3jtZZ8Eiq0Q7kNvwE3eIlT&_nc_oc=AdkM7pc9AWJPZ_tOVflWQ2V3COgfYlr-Lfbgi9FqkeuAstOpd15bwWp4je5OUFnRws780fe78936gOyBJFtSknJR&_nc_zt=23&_nc_ht=scontent.fcnx2-1.fna&_nc_gid=5Va_FP1S6E0ni-Gvwp2Psw&oh=00_AfYrRa3ENlfakEoQJx6E3trORcxrJ7vwYn9qwVWyau1mRw&oe=68C721BC" alt="Product 1"> <span class="badge"><i class="ri-truck-line"></i> 120</span> <h3>มูชิคิงแดงไต้หวัน</h3> <p>Allomyrina dichotoma tunobosonis:ตัวอ่อนระยะL1-2:1ตัว</p> </article> <article class="product-card"> <div class="media"> <img loading="lazy" src="https://scontent.fcnx2-1.fna.fbcdn.net/v/t39.30808-6/545403139_3977550275909014_4858988793687899371_n.jpg?_nc_cat=111&ccb=1-7&_nc_sid=833d8c&_nc_ohc=yU3z0XerI28Q7kNvwEAnp2A&_nc_oc=Adn3HdYURh3ZEtaKJ4xUHkR62-F7jeqEYV8os-IlzVOPHgmcuVJsPNHGwgZKhSgproJP9tLj1iDWIGyIXn2XaoXi&_nc_zt=23&_nc_ht=scontent.fcnx2-1.fna&_nc_gid=Tdg2PmBCdy3emcZ1_3OcJg&oh=00_AfZqH0hsZ_DlrWRXui8XCQ_337h7P_dZC0mqRHY9hfYkww&oe=68C70B7A" alt="Product 1"> <span class="badge"><i class="ri-truck-line"></i> 450</span> <h3>ด้วงกว่างเนปจูน</h3> <p>Dynastes neptunus:122xff:ตัวอ่อนระยะL1-2:1ตัว</p> </article> <article class="product-card"> <div class="media"> <img loading="lazy" src="https://scontent.fcnx2-1.fna.fbcdn.net/v/t39.30808-6/546159045_3977627835901258_2855125613256063887_n.jpg?_nc_cat=101&ccb=1-7&_nc_sid=127cfc&_nc_ohc=kr-r1Ul9fZAQ7kNvwHMHbi1&_nc_oc=AdkdFs41Q-OJkz-PI_QoJtxQNmA9IKn_S6vwQKOryORmm6hNJblgNCkphJviKXvtBlvWOCLQwyClcKNxKoY3Z_R2&_nc_zt=23&_nc_ht=scontent.fcnx2-1.fna&_nc_gid=-caWwvKzG3K3lOufZrouyg&oh=00_AfYEzLwm-Q6Za4rh9bYtLF8OLTwzE4IGHEk2N6vuq3W3Rw&oe=68C73712" alt="Product 1"> <span class="badge"><i class="ri-truck-line"></i> 400</span> <h3>ด้วงกว่างเฮอร์คิวลิส</h3> <p>[ISS-JP01xSx][FF136xC68 meteor]x[No18·No19 x C68] ต้นตระกูลสายหนาจากญี่ปุ่นตัวอ่อนระยะL1-2:1ตัว </p> </article> </article> </div> </section> <!-- ========= Section: ตัวอ่อนคีม ========= --> <section id="ตัวอ่อนคีม" class="section-card"> <div class="section-head"> <h2><i class="ri-scissors-2-line"></i> ตัวอ่อนด้วงคีม</h2> <p class="section-sub">อัปเดตล่าสุด9/10/2025</p> <div class="product-grid"> <article class="product-card"> <div class="media"> <img loading="lazy" src="https://scontent.fcnx2-1.fna.fbcdn.net/v/t39.30808-6/534764007_1595629758417957_651926652942492269_n.jpg?_nc_cat=111&ccb=1-7&_nc_sid=833d8c&_nc_ohc=aYJQw20qKLwQ7kNvwE9l46t&_nc_oc=Adm4nNA85GV8j4IWWS18WCjq5vt0PI55Y8LCErdMQMiLw7xywbePSAQcOi3e2Yws7ZUJ4GKiWcxprGxxey1lpIhf&_nc_zt=23&_nc_ht=scontent.fcnx2-1.fna&_nc_gid=RKivyl6lV4-_jLWr4XSGIw&oh=00_AfZIbFa4XqI6h6HTltPtPERzmP9ZkK9qDpYeLP9SnnSJgw&oe=68C719E8" alt="Product 1"> <span class="badge"><i class="ri-truck-line"></i> 150</span> <h3>ด้วงคีมฟันเลื่อยเหนือ</h3> <p> Dorcus titanus platymelus:พ่อพันธุ์ขนาด76 x ffตัวอ่อนระยะL1-2:1ตัว พร้อมก้อนเชื้อเห็ด </article> <article class="product-card"> <div class="media"> <img loading="lazy" src="https://scontent.fcnx2-1.fna.fbcdn.net/v/t39.30808-6/545067287_3977550699242305_2166627880867022300_n.jpg?stp=cp6_dst-jpg_tt6&_nc_cat=110&ccb=1-7&_nc_sid=833d8c&_nc_ohc=diH8yVVXmGYQ7kNvwHzCTFd&_nc_oc=Adn1V9wLgnkNY3BJVAMwhZR-n7qk6GnntxG9WSzuOPekHN3CVMeRpmv7IOztjlijRJNXNByosG_bxVxBJjUSQsSL&_nc_zt=23&_nc_ht=scontent.fcnx2-1.fna&_nc_gid=x0SrAZA_Y-aRLn2TrtNP7g&oh=00_AfYhDGr1UDB-iWW-SBs-M5yTs_DCd_xLFezAvYB0aLX45g&oe=68C734D6" alt="Product 1"> <span class="badge"><i class="ri-truck-line"></i>150</span> <h3>🌈ด้วงคีมสายรุ้ง🪲</h3> <p>Phalacrognathus mueller:พ่อ55xff:ตัวเพาะไต้หวันสีแดง ตัวอ่อนระยะL1-2:1ตัว</p> <div class="card-actions"> </div> </article> <article class="product-card"> <div class="media"> <img loading="lazy" src="https://scontent.fcnx2-1.fna.fbcdn.net/v/t39.30808-6/513887276_1550142886299978_2312744425487066227_n.jpg?stp=cp6_dst-jpg_tt6&_nc_cat=101&ccb=1-7&_nc_sid=833d8c&_nc_ohc=NgkDvDpirUcQ7kNvwEsbVyd&_nc_oc=AdmcPpayY1fPUmTwidvYOEyZJqt3kVpipG4WXfSX9FeDbEriEWY6rSYDpWyiDbyUZLSSYBi58gYM6moa8jebJTgs&_nc_zt=23&_nc_ht=scontent.fcnx2-1.fna&_nc_gid=687ah7dO6Btb3_lh5Zn9uQ&oh=00_Afa3FoSzkFlGtwFqO6kCB6b_XWtZGhXvH-H3URkXSMMSAA&oe=68C72419" alt="Product 1"> <span class="badge"><i class="ri-truck-line"></i> 130</span> <h3>🌈ด้วงคีมสายรุ้ง🪲</h3> <p>Phalacrognathus mueller:พ่อ55ตัวเพาะไต้หวันสีแดงxเมียffตัวเพาะผู้บ่าวขายด้วงสีแดง:ตัวอ่อนระยะL1-2:1ตัว</p> </article> <article class="product-card"> <div class="media"> <img loading="lazy" src="https://scontent.fcnx2-1.fna.fbcdn.net/v/t39.30808-6/498656572_1543209506993316_1939783675521705236_n.jpg?stp=cp6_dst-jpg_tt6&_nc_cat=106&ccb=1-7&_nc_sid=833d8c&_nc_ohc=Z8GC05hx2YgQ7kNvwFbvHF4&_nc_oc=AdkJ4BtCLnmxLeCm5rolldys3z82R4fb4axTqCrcd3ShS8mCfznu_H6MWDEv9zEMf-5wg4cvTBpE-w2tRLKRvEhE&_nc_zt=23&_nc_ht=scontent.fcnx2-1.fna&_nc_gid=knt6XE-odnZVnTfiFi-27g&oh=00_AfZlPAT4LfmZv9IJO09n1b7jBEKnAjLPZzuaMv8cGrgubw&oe=68C71D6D" alt="Product 1"> <span class="badge"><i class="ri-truck-line"></i> 120</span> <h3>🌈ด้วงคีมสายรุ้ง🪲</h3> <p>Phalacrognathus mueller:พ่อ55ตัวเพาะไต้หวันสีแดงxเมียffตัวเพาะผู้บ่าวขายด้วงสีnormal:ตัวอ่อนระยะL1-2:1ตัว</p> </article> <article class="product-card"> <div class="media"> <img loading="lazy" src="https://scontent.fcnx2-1.fna.fbcdn.net/v/t39.30808-6/504101680_1529163891731211_7871670724186730091_n.jpg?stp=cp6_dst-jpg_tt6&_nc_cat=107&ccb=1-7&_nc_sid=833d8c&_nc_ohc=MOowzOcfr6oQ7kNvwEZnTVh&_nc_oc=Adk3z4qjWHzd5KT-iWDnOXAjmM-8-sLV_AAmFMUjZ74q5VktQcwSn5-qUB6LRFACf00DqyMPT-tDSyRrehlnjxrk&_nc_zt=23&_nc_ht=scontent.fcnx2-1.fna&_nc_gid=fyuWyh8PVb3nlySqyXltSg&oh=00_AfZmvnfx8R48IU1EO-Z0FwOaWizJ6qfkk3Yb6BWsbSuZng&oe=68C74050" alt="Product 1"> <span class="badge"><i class="ri-truck-line"></i> 150</span> <h3>ด้วงคีมแลมพลีม่า</h3> <p>Lamprima adolphinae:ตัวเพาะนำเข้าจาก➡️🎌:ตัวอ่อนระยะL1-2:1ตัว</p> </article> </article> <article class="product-card"> <div class="media"> <img loading="lazy" src="https://scontent.fcnx2-1.fna.fbcdn.net/v/t39.30808-6/546366080_3977653509232024_5852384403836218657_n.jpg?_nc_cat=104&ccb=1-7&_nc_sid=833d8c&_nc_ohc=7cOhsy6OLW0Q7kNvwFoIUUc&_nc_oc=AdkVo64HbUlgG6CyIMIv_2GKPOFPNpCJ6jU12STxT-NRzP1D5fxp0eGVtgi-BTBZxYVvAELzqfyg7PPgWlH80xXt&_nc_zt=23&_nc_ht=scontent.fcnx2-1.fna&_nc_gid=hxdf39V65F6uXqenxZEmvA&oh=00_AfYXhTyXY90VZ6mPJ09ZpVz9O0ocxOe72cwrz2EpIwCy4g&oe=68C727BC" alt="Product 1"> <span class="badge"><i class="ri-truck-line"></i> 150</span> <h3>🦓ด้วงคีมหลังม้าลาย</h3> <p>𝙥𝙧𝙤𝙨𝙤𝙥𝙤𝙘𝙤𝙞𝙡𝙪𝙨 𝙯𝙚𝙗𝙧𝙖 𝙣𝙤𝙗𝙪𝙮𝙪𝙠𝙞:อินโดนีเซีย:ตัวอ่อนระยะL2:1ตัว</p> </article> </article> <article class="product-card"> <div class="media"> <img loading="lazy" src="https://scontent.fcnx2-1.fna.fbcdn.net/v/t39.30808-6/546027932_3977654815898560_2470802768524271975_n.jpg?_nc_cat=100&ccb=1-7&_nc_sid=833d8c&_nc_ohc=om_aIDbV9rAQ7kNvwGuHLGk&_nc_oc=AdmaWOUfA6JN3l0RFURryNVr5ajMhJ3Au7uThCqzzF7N6CdETs-1hn5zNc0iD62sqGm_FGUCm6oy9Uz6We77yj5B&_nc_zt=23&_nc_ht=scontent.fcnx2-1.fna&_nc_gid=udgeK3Y1lwibarwsXfq7oA&oh=00_AfZbbmIuV--WrKINu-k6cEN6nDf2AXjuPlQ46WtyfT7Vnw&oe=68C71781" alt="Product 1"> <span class="badge"><i class="ri-truck-line"></i> 150</span> <h3>ด้วงคีมดาบญี่ปุ่น</h3> <p>Prosopocoilus inclinatus inclinatus::ตัวอ่อนระยะL1-2:1ตัว</p> </article> </article> <article class="product-card"> <div class="media"> <img loading="lazy" src="https://scontent.fcnx2-1.fna.fbcdn.net/v/t39.30808-6/545887357_3977550462575662_3570993849996652185_n.jpg?stp=cp6_dst-jpg_tt6&_nc_cat=109&ccb=1-7&_nc_sid=833d8c&_nc_ohc=NPJwXLzGKbYQ7kNvwEx0uTx&_nc_oc=AdnB54cUSbbbISrgBnNPmDn0oCQKAd5s-y-Qz1Gzmbr92uxwlvufoqn3JdPFgDK8yXFsv2sFaJvBoe41R8UG6au6&_nc_zt=23&_nc_ht=scontent.fcnx2-1.fna&_nc_gid=CtsLP9swkWXL8RoTl7ZLPw&oh=00_Afa7KTCE62M3hnD8NVF460nDO0HrCx0ee66ZgGd9Y4W64Q&oe=68C72777" alt="Product 1"> <span class="badge"><i class="ri-truck-line"></i> 40</span> <h3>ด้วงคีมเนื้อทรายเชียงใหม่</h3> <p>Cyclommatus pahangensis chiangmaiensis:ตัวอ่อนระยะL1-2:1ตัว</p> </article> </article> </div> </section>
+
+    <!-- COMING SOON -->
+    <section id="coming-soon" class="section-card">
+      <div class="section-head">
+        <h2><i class="ri-time-line"></i> COMING SOON</h2>
+        <p class="section-sub">เตรียมเพาะล่าสุด</p>
+      </div>
+
+      <div class="product-grid">
+        <!-- ยกตัวอย่าง 4 รายการ (ใช้ภาพเดิมเพื่อความต่อเนื่อง) -->
+        <article class="product-card">
+          <div class="media">
+            <img loading="lazy" src="https://scontent.fcnx2-1.fna.fbcdn.net/v/t39.30808-6/546408954_3977695859227789_5411595125124297099_n.jpg?stp=cp6_dst-jpg_tt6&_nc_cat=111&ccb=1-7&_nc_sid=833d8c&_nc_ohc=xbVpKVo6VEcQ7kNvwHQlRlK&_nc_oc=AdlgggK8Flx_Ox9Apr7wpORFEVNs9od3acNXQit4vDOtxK-5hgFAkrrs4xTQN2cUeecZzh2mdqYlPNIik8Roaq5q&_nc_zt=23&_nc_ht=scontent.fcnx2-1.fna&_nc_gid=Xls9Tab4Q8NacYw2Yx2t6A&oh=00_AfZzL7JNo3rHWTuD61mqEkyyNUx1FMzhJ8C5fa-M2TjHmg&oe=68C7482D" alt=>
+            <span class="badge"><i class="ri-notification-3-line"></i> Soon</span>
+          </div>
+          <h3>ด้วงคีมเนื้อทรายเขี้ยวจันทร์</h3>
+          <p>44 x FF x FF</p>
+        </article>
+
+        <article class="product-card">
+          <div class="media">
+            <img loading="lazy" src="https://scontent.fcnx2-1.fna.fbcdn.net/v/t39.30808-6/546624472_3977550745908967_3269523294830183482_n.jpg?stp=cp6_dst-jpg_tt6&_nc_cat=103&ccb=1-7&_nc_sid=833d8c&_nc_ohc=uYwhBKsgjzkQ7kNvwFgYA_0&_nc_oc=AdnnWcvweeBGcbD6OOvfs3I12APjxZ29KkwpZUwZs8-SUrO_a9WZQUwUZFeZ4TWlP2oZlZRc_c_vZmHSRMrDoFC6&_nc_zt=23&_nc_ht=scontent.fcnx2-1.fna&_nc_gid=H1FuLCBRpFYdBgnUe5-J9w&oh=00_AfbpRNExsjY8DnHOdPs0nhTPI6UsYJJUjWu5PBRuQh4XZg&oe=68C75074" alt="สายรุ้ง">
+            <span class="badge"><i class="ri-notification-3-line"></i> Soon</span>
+          </div>
+          <h3>ด้วงคีมปลวกเมลยี</h3>
+          <p>51 x FF x FF</p>
+        </article>
+
+        <article class="product-card">
+          <div class="media">
+            <img loading="lazy" src="https://scontent.fcnx2-1.fna.fbcdn.net/v/t39.30808-6/545159868_3977550692575639_6369910549719749265_n.jpg?stp=cp6_dst-jpg_tt6&_nc_cat=108&ccb=1-7&_nc_sid=833d8c&_nc_ohc=dA98su2tQyUQ7kNvwGIkYqr&_nc_oc=Adk6tug6K6RGu68eKVHItRfpTvUXXuDxoYOoIBE6dNZkikiB70-Ub3iJE7426Y1-3oc4qOXYjkpGag1Ydon3JLNB&_nc_zt=23&_nc_ht=scontent.fcnx2-1.fna&_nc_gid=VNpK6vIpQqi088GOXlDJKw&oh=00_AfalpklFOfMZazVnw0ydqD6KqC9PS6FH0Ov9w1-7io71kQ&oe=68C74F9D" alt="สายรุ้งแดง">
+            <span class="badge"><i class="ri-notification-3-line"></i> Soon</span>
+          </div>
+          <h3>ด้วงคีมเขี้ยวย่น</h3>
+          <p>31 x FF x FF</p>
+        </article>
+
+        <article class="product-card">
+          <div class="media">
+            <img loading="lazy" src="https://scontent.fcnx2-1.fna.fbcdn.net/v/t39.30808-6/546564036_3977655489231826_4633375892941135868_n.jpg?stp=cp6_dst-jpg_tt6&_nc_cat=100&ccb=1-7&_nc_sid=833d8c&_nc_ohc=d-CwC84uex8Q7kNvwHjNJwb&_nc_oc=Adn7DFMdbX7T8_XUyXj8RqdjOSZkC5yaxBqYBm644WxzLD8XQMSuG4H4iJKwCGj_OX9g2sk2Ir6V99S-rOB3jCnY&_nc_zt=23&_nc_ht=scontent.fcnx2-1.fna&_nc_gid=1kjKwKLD3etpG7cFR-TBww&oh=00_AfY7r00BsDe3yYn5c6jjb7PJc3lCPt-Qe4-tck5Owgboaw&oe=68C72117" alt="แลมพลีม่า">
+            <span class="badge"><i class="ri-notification-3-line"></i> Soon</span>
+          </div>
+          <h3>ด้วงคีมยีราฟ</h3>
+          <p>94 x FF x FF</p>
+        </article>
+
+          <article class="product-card">
+          <div class="media">
+            <img loading="lazy" src="https://scontent.fcnx2-1.fna.fbcdn.net/v/t39.30808-6/545560096_3977550642575644_6394128480285298488_n.jpg?stp=cp6_dst-jpg_tt6&_nc_cat=104&ccb=1-7&_nc_sid=833d8c&_nc_ohc=uOk3T4WE-r8Q7kNvwFQVrGw&_nc_oc=Adl-PNMvFSWXGR9kv1fOnvJH44LubHvUq4NvolDxs9slw0Ba6Y1L4W6Zeu_TSd6qSxFAtnHrxNIGT6KbTgOgyyvq&_nc_zt=23&_nc_ht=scontent.fcnx2-1.fna&_nc_gid=rkidG_UMSCUAvfhFIODh7w&oh=00_AfbQX9C5TWrjsP-WKsU83wJYGez3STUNkMo4myE2S5oCDg&oe=68C72CC3" alt="แลมพลีม่า">
+            <span class="badge"><i class="ri-notification-3-line"></i> Soon</span>
+          </div>
+          <h3>ด้วงคีมสมันอกดำ</h3>
+          <p>42 x FF</p>
+        </article>
+        </article>
+      </div>
+    </section>
+
+    <!-- Shipping Options -->
+    <section class="shipping-section" aria-labelledby="shipTitle">
+      <div class="shipping-header">
+        <h3 id="shipTitle"><i class="ri-truck-line"></i> เลือกวิธีจัดส่งได้ 2 อย่าง</h3>
+        <div class="chip post"><i class="ri-vip-crown-2-line"></i> ค่าจัดส่ง: EMS 80฿</div>
+      </div>
+      <div class="ship-grid">
+        <!-- Thai Post EMS -->
+        <div class="ship-card" data-method="thaipost">
+          <div class="ship-logo">
+            <svg viewBox="0 0 64 64" width="36" height="36" aria-hidden="true"><use href="#logo-thaipost"></use></svg>
+          </div>
+          <div class="ship-info">
+            <p class="ship-title">ไปรษณีย์ไทย (EMS) <span class="chip post">E</span></p>
+            <p class="ship-sub">จัดส่งด่วน มีเลขติดตาม</p>
+          </div>
+          <input type="radio" name="shipping" aria-label="เลือกไปรษณีย์ไทย EMS" />
+        </div>
+
+        <!-- Flash -->
+        <div class="ship-card" data-method="flash">
+          <div class="ship-logo" style="background:#1b1b1b">
+            <svg viewBox="0 0 64 64" width="36" height="36" aria-hidden="true"><use href="#logo-flash"></use></svg>
+          </div>
+          <div class="ship-info">
+            <p class="ship-title">Flash Express <span class="chip flash"><i class="ri-flashlight-line"></i> ตามพื้นที่</span></p>
+            <p class="ship-sub">รวดเร็ว ยืดหยุ่น กำหนดเวลารับได้</p>
+          </div>
+          <input type="radio" name="shipping" aria-label="เลือก Flash Express" />
+        </div>
+      </div>
+
+
+
+      
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <p>&copy; 2025 PhotharamBeetle. By Knathip Sasibut.</p>
+  </footer>
+
+  <!-- FAB ติดต่อแอดมิน -->
+  <div class="fab" id="fab">
+    <div class="fab-menu" aria-label="ช่องทางติดต่อแอดมิน">
+      <a class="fab-item" href="https://m.me/photharambeetle" target="_blank" rel="noopener"><i class="ri-messenger-line"></i> Messenger</a>
+      <a class="fab-item" href="https://www.facebook.com/photharambeetle" target="_blank" rel="noopener"><i class="ri-facebook-circle-fill"></i> Facebook</a>
+      <a class="fab-item" href="tel:0922872182" rel="noopener"><i class="ri-phone-line"></i> โทรหาแอดมิน</a>
+    </div>
+    <button class="fab-btn" id="fabBtn" aria-expanded="false" aria-controls="fabMenu" title="ติดต่อแอดมิน">
+      <i class="ri-customer-service-2-line"></i>
+    </button>
+  </div>
+
+  <script>
+    /* Drawer */
+    const drawer = document.getElementById('drawer');
+    const overlay = document.getElementById('overlay');
+    const menuBtn = document.getElementById('menuBtn');
+    const closeBtn = document.getElementById('closeDrawer');
+    function openNav(){drawer.classList.add('open'); overlay.classList.add('show'); drawer.setAttribute('aria-hidden','false'); menuBtn.setAttribute('aria-expanded','true'); document.body.style.overflow='hidden'}
+    function closeNav(){drawer.classList.remove('open'); overlay.classList.remove('show'); drawer.setAttribute('aria-hidden','true'); menuBtn.setAttribute('aria-expanded','false'); document.body.style.overflow=''}
+    menuBtn.addEventListener('click', openNav);
+    closeBtn.addEventListener('click', closeNav);
+    overlay.addEventListener('click', closeNav);
+    window.addEventListener('keydown', (e)=>{ if(e.key==='Escape') closeNav() });
+
+    /* FAB */
+    const fab = document.getElementById('fab');
+    const fabBtn = document.getElementById('fabBtn');
+    fabBtn.addEventListener('click', ()=> {
+      fab.classList.toggle('open');
+      const expanded = fabBtn.getAttribute('aria-expanded') === 'true';
+      fabBtn.setAttribute('aria-expanded', String(!expanded));
+    });
+
+    /* Background FX */
+    const fxWrap = document.getElementById('fxWrap');
+    const PARTICLES = 30;
+    for(let i=0;i<PARTICLES;i++){
+      const p = document.createElement('span');
+      p.className = 'particle';
+      p.style.top = (Math.random()*100)+'%';
+      p.style.left = (Math.random()*100)+'%';
+      const size = 4 + Math.random()*6;
+      p.style.width = size+'px'; p.style.height = size+'px';
+      p.style.animationDuration = (6 + Math.random()*8)+'s';
+      p.style.animationDelay = (Math.random()*6)+'s';
+      fxWrap.appendChild(p);
+    }
+    const BEETLES = 8;
+    for(let i=0;i<BEETLES;i++){
+      const flyer = document.createElement('div');
+      flyer.className = 'flyer';
+      if(Math.random()>0.5) flyer.classList.add('flip');
+      flyer.style.top = (10 + Math.random()*80) + 'vh';
+      flyer.style.animationDuration = (16 + Math.random()*16) + 's';
+      flyer.style.animationDelay = (Math.random()*10) + 's';
+      flyer.style.transform = `scale(${0.7 + Math.random()*0.7})`;
+      flyer.innerHTML = `<svg viewBox="0 0 64 64" width="64" height="64" aria-hidden="true"><use href="#beetle"></use></svg>`;
+      fxWrap.appendChild(flyer);
+    }
+
+    /* Shipping selection */
+    const LS_KEY = 'shipping_method'; // 'thaipost' | 'flash'
+    const shipCards = Array.from(document.querySelectorAll('.ship-card'));
+    function setActive(method){
+      shipCards.forEach(c=>{
+        const m = c.getAttribute('data-method');
+        c.classList.toggle('active', m === method);
+        const input = c.querySelector('input[type="radio"]');
+        if(input) input.checked = (m === method);
+      });
+      localStorage.setItem(LS_KEY, method);
+    }
+    const saved = localStorage.getItem(LS_KEY) || 'thaipost';
+    setActive(saved);
+    shipCards.forEach(c=> c.addEventListener('click', ()=> setActive(c.getAttribute('data-method')) ));
+  </script>
+</body>
+</html>
